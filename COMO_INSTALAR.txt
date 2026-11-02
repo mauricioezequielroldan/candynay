@@ -1,0 +1,58 @@
+MT MOTO SERVICE - Como poner la app en el celular
+================================================
+
+1) Publicarla con GitHub Pages (si ya la tenias publicada, solo reemplaza los archivos):
+   - github.com > repositorio mt-moto-service > Add file > Upload files
+   - Arrastrar TODOS los archivos de esta carpeta > Commit changes.
+   - (Primera vez) Settings > Pages > Branch: main / (root) > Save.
+   - Link: https://TU-USUARIO.github.io/mt-moto-service/
+
+2) Instalar en el celular:
+   - Android (Chrome): abrir el link > menu (3 puntitos) > "Instalar app".
+   - iPhone (Safari): Compartir > "Agregar a inicio".
+   Si ya estaba instalada: al abrirla aparece "Hay una version nueva" > Actualizar.
+
+3) PIN: Ajustes > PIN de acceso > Guardar PIN.
+
+4) FACTURAR (monotributo):
+   - Instalar tambien el Facturador de ARCA en el celular (facturador.afip.gob.ar)
+     y entrar una vez con CUIT y clave fiscal.
+   - En la app: armar el presupuesto > "Facturar en ARCA".
+   - El monto se copia solo y se abre ARCA: pegar el monto > Facturar > Confirmar.
+   - Volver a la app > anotar el numero de comprobante > "Marcar como facturado".
+
+5) Pasar datos de la compu al celular:
+   Compu: Configuracion > Descargar copia completa > mandarse el archivo
+   Celular: Ajustes > Restaurar copia.
+
+------------------------------------------------
+NOVEDADES VERSION 5.0 (MR Production)
+------------------------------------------------
+- PDF profesional: boton "Enviar PDF". En el celular se abre el menu para mandarlo
+  directo por WhatsApp (o mail, Drive...). En la compu se descarga.
+- Pagos y senas: debajo del total se registran pagos (efectivo, transferencia,
+  Mercado Pago...). Muestra el saldo, sale en el PDF y en Trabajos ("Debe $...").
+- Caja de hoy: en Trabajos, lo cobrado en el dia separado por medio de pago.
+- Control del monotributo: en Ajustes > Facturacion ARCA cargar la categoria y el
+  tope anual. En Trabajos se ve cuanto se facturo en 12 meses y avisa al 80%.
+  Categorias D a K: el boton de facturar lleva a Comprobantes en linea.
+- Copia en Google Drive o WhatsApp: Ajustes > "Guardar copia" abre el menu del
+  celular para elegir Drive, WhatsApp o mail. Para recuperar: Restaurar copia.
+- Asistente de bienvenida la primera vez (nombre, telefono, direccion y logo).
+- Aviso de version nueva: ya no hace falta cerrar y abrir la app dos veces.
+- Ademas (v4): historial por patente, recordatorios de service, aviso de copia.
+- Los datos de versiones anteriores se conservan: no hay que hacer nada.
+
+------------------------------------------------
+PARA MR PRODUCTION: ARMAR LA APP DE UN CLIENTE NUEVO
+------------------------------------------------
+1) Copiar esta carpeta entera y renombrarla (ej: gomeria-pedro).
+2) En index.html, buscar "CONFIGURACION DEL CLIENTE" y cambiar ese bloque:
+   - id: UNICO por cliente (ej: "gomeria_pedro"). Nunca repetir uno ya usado.
+   - nombre, colores, vehiculo/patente segun el rubro, tu WhatsApp de soporte.
+   (Para MT Moto Service NO cambiar el id "mtms".)
+3) En index.html, cambiar la lista EJEMPLO por precios del rubro del cliente.
+4) manifest.json: cambiar "name" y "short_name". Reemplazar icon-192.png e icon-512.png.
+5) En index.html (arriba de todo) cambiar <title> y "apple-mobile-web-app-title".
+6) Publicar (subir TODOS los archivos, incluido pdf.js).
+   Cuando actualices una app ya publicada, subi el numero V en sw.js.

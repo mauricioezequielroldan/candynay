@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141414">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="MT Service">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>MT Moto Service · Presupuestos</title>
+<style>
+:root{--am:#F2E205;--am2:#d9c800;--ng:#141414;--ng2:#222;--gr:#f3f3f1;--bd:#ddd;--tx:#1b1b1b;--mut:#6b6b6b;--ok:#1f9d55;--err:#d64545;--az:#0b5cab}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--gr);color:var(--tx);font-size:15px}
+header{background:var(--ng);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 18px;flex-wrap:wrap}
+header img{height:58px;width:74px;object-fit:contain;border-radius:10px;background:#000}
+header h1{font-size:20px;margin:0}
+header h1 span{color:var(--am)}
+nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+nav button{background:var(--ng2);color:#fff;border:1px solid #333;padding:9px 14px;border-radius:8px;cursor:pointer;font-weight:600}
+nav button.act{background:var(--am);color:#000;border-color:var(--am)}
+#aviso{display:none;background:#fde8e8;color:#7a1414;border-bottom:3px solid var(--err);padding:10px 18px;font-size:14px}
+#avisoT{display:block;font-size:15px;margin-bottom:2px}
+#aviso .btn{margin-top:6px}
+main{padding:16px;max-width:1300px;margin:auto}
+.tab{display:none}.tab.act{display:block}
+.card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:17px;border-left:5px solid var(--am);padding-left:8px}
+.grid2{display:grid;grid-template-columns:380px 1fr;gap:14px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;width:100%;background:#fff;color:var(--tx)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--am);border-color:var(--am2)}
+label{font-size:12px;color:var(--mut);font-weight:600;display:block;margin-bottom:3px}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.btn{background:var(--ng);color:#fff;border:none;padding:9px 14px;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;text-decoration:none;display:inline-block;font-size:15px}
+.btn:hover{opacity:.88}
+.btn:focus-visible,nav button:focus-visible,.chip:focus-visible{outline:3px solid var(--am);outline-offset:2px}
+.btn.am{background:var(--am);color:#000}
+.btn.wa{background:#25D366;color:#000}
+.btn.lt{background:#e9e9e6;color:#000}
+.btn.rd{background:var(--err)}
+.btn.az{background:var(--az)}
+.btn.sm{padding:5px 9px;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chips{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid var(--bd);background:#fff;cursor:pointer;font-size:13px;font-weight:600}
+.chip.act{background:var(--ng);color:var(--am);border-color:var(--ng)}
+.pick{max-height:560px;overflow:auto;border:1px solid var(--bd);border-radius:8px}
+.pi{display:flex;justify-content:space-between;gap:8px;padding:9px 10px;border-bottom:1px solid #eee;cursor:pointer}
+.pi:hover{background:#fffbd0}
+.pi small{color:var(--mut);display:block;font-size:11px}
+.pi b{white-space:nowrap}
+table{width:100%;border-collapse:collapse}
+th{background:var(--ng);color:#fff;text-align:left;padding:8px;font-size:13px}
+td{padding:6px 8px;border-bottom:1px solid #eee;vertical-align:middle}
+td input,td select{padding:6px 8px}
+.num{text-align:right}
+.tot{display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-top:10px}
+.tot div{display:flex;gap:14px;min-width:280px;justify-content:space-between;align-items:center}
+.tot .big{font-size:22px;font-weight:800;background:var(--am);padding:6px 12px;border-radius:8px}
+.tag{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700;white-space:nowrap}
+.t-Servicio{background:#e6f0ff;color:#1d4ed8}.t-Repuesto{background:#fff3cd;color:#8a6d00}.t-Otro{background:#eee;color:#444}
+.t-fact{background:#dbeafe;color:var(--az)}.t-nofact{background:#f1f1f1;color:#777}
+.est{font-weight:700;border-radius:8px}
+.empty{color:var(--mut);text-align:center;padding:24px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ng);color:var(--am);padding:10px 18px;border-radius:10px;font-weight:700;display:none;z-index:300;max-width:90vw;text-align:center}
+.help{font-size:12px;color:var(--mut);margin-top:6px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}
+.kpi div{background:#fff;border-radius:10px;padding:10px;border-left:5px solid var(--am)}
+.kpi b{font-size:20px;display:block}
+.factEstado{margin-top:10px;padding:8px 12px;border-radius:8px;background:#dbeafe;color:var(--az);font-weight:700;display:none}
+.banner{display:none;background:#fff8d6;color:#5c4a00;border-bottom:3px solid var(--am2);padding:10px 18px;font-size:14px}
+.banner.on{display:block}
+.banner .row{margin-top:6px}
+.hist{display:none;margin-top:10px;padding:9px 12px;border-radius:8px;background:#eef6ff;color:#0b3a6b;font-size:14px}
+.hist.on{display:block}
+.hist .row{margin-top:6px}
+.rec{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #eee;flex-wrap:wrap}
+.rec:last-child{border-bottom:none}
+.rec small{color:var(--mut);display:block}
+.firma{font-size:12px;color:var(--mut);text-align:center;padding:10px 0 18px}
+.firma a{color:var(--mut)}
+.pagos{margin-top:12px;padding:10px 12px;border:1px dashed var(--bd);border-radius:10px;background:#fafaf8}
+.pg{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #eee;font-size:14px}
+.pg:last-child{border-bottom:none}
+.saldo{font-weight:800}.saldo.debe{color:var(--err)}.saldo.ok{color:var(--ok)}
+.t-debe{background:#fee2e2;color:#9b1c1c}.t-pago{background:#d1fae5;color:#065f46}
+.bar{height:14px;border-radius:7px;background:#eee;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--ok)}
+.bar.medio i{background:#e0a100}.bar.alto i{background:var(--err)}
+.caja{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.caja div{background:#f6f6f4;border-radius:8px;padding:8px 10px;font-size:13px}.caja b{display:block;font-size:17px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:160;display:none;align-items:center;justify-content:center;padding:12px}
+.modal.on{display:flex}
+.modal .box{background:#fff;border-radius:14px;max-width:480px;width:100%;max-height:92vh;overflow:auto;padding:18px}
+.modal h3{margin:0 0 6px;font-size:20px}
+.wlogo{display:flex;align-items:center;gap:12px;margin-top:10px}
+.wlogo img{height:56px;width:72px;object-fit:contain;border-radius:10px;background:#000}
+
+/* ===== Ventana FACTURAR ===== */
+#fact{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:150;display:none;align-items:center;justify-content:center;padding:12px}
+#fact.on{display:flex}
+#fact .box{background:#fff;border-radius:14px;max-width:520px;width:100%;max-height:92vh;overflow:auto;padding:16px}
+#fact h3{margin:0 0 4px;font-size:19px}
+.paso{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #eee}
+.paso .n{background:var(--ng);color:var(--am);border-radius:50%;width:28px;height:28px;flex:0 0 28px;display:flex;align-items:center;justify-content:center;font-weight:800}
+.paso .c{flex:1;min-width:0}
+.monto{font-size:30px;font-weight:800;background:var(--am);border-radius:8px;padding:4px 12px;display:inline-block;margin:4px 0}
+.warn{background:#fff3cd;color:#7a5b00;padding:8px 10px;border-radius:8px;font-size:13px;margin-top:8px}
+.det{font-size:13px;background:#f6f6f6;border-radius:8px;padding:8px;white-space:pre-wrap;margin:6px 0;max-height:120px;overflow:auto}
+
+/* ===== IMPRESIÓN ===== */
+#print{display:none}
+@media print{
+  body{background:#fff}
+  header,main,#toast,#aviso,#lock,.mtot,#fact{display:none!important}
+  #print{display:block;font-size:13px;color:#000}
+  @page{margin:14mm}
+}
+.ph{display:flex;align-items:center;gap:16px;border-bottom:4px solid var(--am);padding-bottom:10px}
+.ph img{height:90px;width:114px;object-fit:contain;border-radius:10px;background:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ph h2{margin:0;font-size:22px}
+.ph .nro{margin-left:auto;text-align:right}
+.pbox{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;margin:12px 0;padding:10px;background:#f6f6f6;border-radius:6px}
+#print th{background:#141414!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#print .big{background:var(--am)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pfoot{margin-top:24px;font-size:11px;color:#444;border-top:1px solid #ccc;padding-top:8px}
+
+/* ===== PIN ===== */
+#lock{position:fixed;inset:0;background:var(--ng);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff;padding:20px}
+#lock.on{display:flex}
+#lock img{width:150px;border-radius:14px}
+#lock input{max-width:220px;text-align:center;font-size:28px;letter-spacing:10px;background:#222;color:var(--am);border-color:#444}
+#lock .msg{color:#ff8a8a;min-height:20px;font-size:14px}
+.mtot{display:none}
+
+/* ===== CELULAR ===== */
+@media(max-width:700px){
+ body{font-size:16px;padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+ input,select,textarea{font-size:16px}
+ header{padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top));gap:10px;position:sticky;top:0;z-index:50}
+ header img{height:40px;width:52px}
+ header h1{font-size:18px}
+ nav{position:fixed;left:0;right:0;bottom:0;margin:0;background:var(--ng);padding:6px 6px calc(6px + env(safe-area-inset-bottom));gap:4px;flex-wrap:nowrap;z-index:60;box-shadow:0 -2px 8px rgba(0,0,0,.3)}
+ nav button{flex:1;padding:8px 2px;font-size:11px;line-height:1.3;border:none;background:transparent;color:#ccc}
+ nav button.act{background:var(--am);color:#000}
+ nav button .ic{display:block;font-size:20px}
+ main{padding:10px}
+ .card{padding:12px;border-radius:10px}
+ .pick{max-height:260px}
+ .btn{padding:11px 14px}
+ .btn.sm{padding:8px 11px}
+ .row>.btn,.row>label.btn{flex:1 1 auto;text-align:center}
+ .tot div{min-width:0;width:100%}
+ thead{display:none}
+ table,tbody{display:block;width:100%}
+ td{border:none;padding:3px}
+ #lineas tr,#tPrecios tr,#tTrab tr{display:grid;gap:6px;padding:10px 0;border-bottom:1px solid #e5e5e5;align-items:center}
+ #lineas tr{grid-template-columns:70px 1fr auto auto}
+ #lineas td:nth-child(1){grid-column:1/4}
+ #lineas td:nth-child(5){grid-column:4;grid-row:1}
+ #lineas td:nth-child(2){grid-column:1;grid-row:2}
+ #lineas td:nth-child(3){grid-column:2;grid-row:2}
+ #lineas td:nth-child(4){grid-column:3/5;grid-row:2;min-width:90px}
+ #tPrecios tr{grid-template-columns:1fr 130px auto}
+ #tPrecios td:nth-child(2){grid-column:1/3;grid-row:1}
+ #tPrecios td:nth-child(4){grid-column:3;grid-row:1}
+ #tPrecios td:nth-child(1){grid-column:1;grid-row:2}
+ #tPrecios td:nth-child(3){grid-column:2/4;grid-row:2}
+ #tTrab tr{grid-template-columns:auto 1fr auto;background:#fff}
+ #tTrab td:nth-child(1){grid-column:1;grid-row:1}
+ #tTrab td:nth-child(3){grid-column:2;grid-row:1;font-weight:700}
+ #tTrab td:nth-child(6){grid-column:3;grid-row:1}
+ #tTrab td:nth-child(2){grid-column:1;grid-row:2;color:var(--mut);font-size:13px}
+ #tTrab td:nth-child(4){grid-column:2;grid-row:2;font-size:14px}
+ #tTrab td:nth-child(5){grid-column:3;grid-row:2;font-size:13px;color:var(--mut)}
+ #tTrab td:nth-child(7){grid-column:1/4;grid-row:3}
+ #tTrab td:nth-child(8){grid-column:1/4;grid-row:4}
+ #tTrab td:nth-child(8) .row .btn{flex:1}
+ td[colspan]{display:block}
+ .kpi{grid-template-columns:1fr 1fr}
+ .kpi b{font-size:18px}
+ .mtot{display:flex;position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:40;background:var(--ng);color:#fff;border-radius:12px;padding:10px 14px;justify-content:space-between;align-items:center;margin-top:8px;box-shadow:0 2px 10px rgba(0,0,0,.25);gap:8px}
+ .mtot b{color:var(--am);font-size:20px}
+ #toast{bottom:calc(140px + env(safe-area-inset-bottom))}
+ #fact{align-items:flex-end;padding:0}
+ #fCerrar{flex:0 0 auto!important}
+ #fact .box{border-radius:14px 14px 0 0;max-height:94vh;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <img id="hLogo" alt="Logo">
+  <h1 id="hNombre">MT <span>Moto Service</span></h1>
+  <nav>
+    <button type="button" data-t="pres" class="act"><span class="ic">🧾</span> Presupuesto</button>
+    <button type="button" data-t="precios"><span class="ic">💲</span> Precios</button>
+    <button type="button" data-t="trab"><span class="ic">🔧</span> Trabajos</button>
+    <button type="button" data-t="conf"><span class="ic">⚙️</span> Ajustes</button>
+  </nav>
+</header>
+
+<div id="aviso">
+  <b id="avisoT">⚠️ La app no puede guardar datos en este navegador</b>
+  <span id="avisoM"></span>
+  <div class="row"><button type="button" class="btn sm" id="avisoBk">💾 Descargar copia ahora</button></div>
+</div>
+
+<div id="updBanner" class="banner" role="status"><b>✨ Hay una versión nueva de la app</b><div class="row"><button type="button" class="btn sm am" id="updGo">Actualizar ahora</button></div></div>
+<div id="recCopia" class="banner" role="status">
+  <b id="recCopiaT">💾 Hace tiempo que no descargás una copia de seguridad</b>
+  <div>Si se borra el navegador o cambiás de celular, la copia es lo único que permite recuperar tus presupuestos.</div>
+  <div class="row"><button type="button" class="btn sm am" id="recCopiaSi">☁️ Guardar copia ahora</button><button type="button" class="btn sm lt" id="recCopiaNo">Más tarde</button></div>
+</div>
+
+<main>
+<section id="pres" class="tab act">
+ <div class="grid2">
+  <div class="card">
+   <h2>Elegí servicios y repuestos</h2>
+   <input id="buscar" placeholder="🔍 Buscar: rectificación 110, kit transmisión, aceite..." aria-label="Buscar">
+   <div class="chips" id="chipsPick"></div>
+   <div class="pick" id="pickList"></div>
+   <div class="help">Tocá un ítem para sumarlo. Si lo tocás de nuevo, suma cantidad. Enter agrega el primero.</div>
+  </div>
+  <div>
+   <div class="card">
+    <h2>Presupuesto Nº <span id="pNro"></span></h2>
+    <div class="f">
+     <div><label for="cCliente">Cliente</label><input id="cCliente" placeholder="Nombre y apellido"></div>
+     <div><label for="cTel">Teléfono / WhatsApp</label><input id="cTel" placeholder="343 4123456" inputmode="tel"></div>
+     <div><label for="cMoto" id="lMoto">Moto (marca / modelo)</label><input id="cMoto" placeholder="Honda Wave 110"></div>
+     <div><label for="cPat" id="lPat">Patente</label><input id="cPat" placeholder="A123BCD"></div>
+     <div><label for="cFecha">Fecha</label><input id="cFecha" type="date"></div>
+    </div>
+    <div class="hist" id="hist" aria-live="polite"></div>
+   </div>
+   <div class="card">
+    <h2>Detalle</h2>
+    <table>
+     <thead><tr><th>Descripción</th><th style="width:70px">Cant.</th><th style="width:130px">Precio unit.</th><th style="width:120px" class="num">Subtotal</th><th style="width:40px"></th></tr></thead>
+     <tbody id="lineas"></tbody>
+    </table>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn lt sm" id="addLibre">+ Ítem libre</button></div>
+    <div class="tot">
+     <div><span>Subtotal</span><b id="tSub">$0</b></div>
+     <div><span>Descuento % <input id="cDesc" type="number" min="0" max="100" value="0" style="width:70px;display:inline-block" aria-label="Descuento"></span><b id="tDesc">$0</b></div>
+     <div class="big"><span>TOTAL</span><span id="tTot">$0</span></div>
+    </div>
+    <div class="pagos" id="pagosBox">
+     <div class="row" style="justify-content:space-between"><b>💵 Pagos y señas</b><span id="pSaldo"></span></div>
+     <div id="pagosList"></div>
+     <div class="row" style="margin-top:8px">
+      <input id="pgMonto" inputmode="decimal" placeholder="Monto $" style="max-width:130px" aria-label="Monto del pago">
+      <select id="pgMedio" style="max-width:160px" aria-label="Medio de pago"></select>
+      <button type="button" class="btn sm" id="pgAdd">+ Registrar pago</button>
+     </div>
+    </div>
+    <div class="factEstado" id="factEstado" aria-live="polite"></div>
+    <div style="margin-top:10px"><label for="cNotas">Observaciones</label><textarea id="cNotas" rows="2" placeholder="Ej: El precio de repuestos puede variar según disponibilidad."></textarea></div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end">
+     <button type="button" class="btn lt" id="bNuevo">🆕 Nuevo</button>
+     <button type="button" class="btn" id="bGuardar">💾 Guardar</button>
+     <button type="button" class="btn am" id="bPdf">📄 Enviar PDF</button>
+     <button type="button" class="btn wa" id="bWa">📲 WhatsApp (texto)</button>
+     <button type="button" class="btn lt" id="bPrint">🖨️ Imprimir</button>
+     <button type="button" class="btn az" id="bFact">🧾 Facturar en ARCA</button>
+    </div>
+   </div>
+   <div class="mtot"><span>TOTAL <small id="mCnt" style="color:#aaa"></small></span><b id="mTot">$0</b><button type="button" class="btn am sm" id="mVer">Ver detalle ↓</button></div>
+  </div>
+ </div>
+</section>
+
+<section id="precios" class="tab">
+ <div class="card">
+  <h2>Lista de precios</h2>
+  <div class="row">
+   <input id="bPrecio" placeholder="🔍 Buscar en la lista" style="max-width:300px" aria-label="Buscar en la lista">
+   <select id="fCat" style="max-width:160px" aria-label="Categoría"><option value="">Todas</option><option>Servicio</option><option>Repuesto</option><option>Otro</option></select>
+   <button type="button" class="btn am" id="nuevoItem">+ Agregar ítem</button>
+   <span style="flex:1"></span>
+   <button type="button" class="btn lt" id="expCSV">⬇️ Exportar a Excel</button>
+   <label class="btn lt" style="margin:0;color:#000;font-size:15px">⬆️ Importar de Excel (CSV)<input type="file" id="impCSV" accept=".csv,.txt" hidden></label>
+  </div>
+  <div class="row" style="margin:12px 0;background:#fffbd0;padding:10px;border-radius:8px">
+   <b>Actualización rápida:</b> aumentar
+   <input id="aumPct" type="number" value="10" style="width:80px" aria-label="Porcentaje"> %
+   a <select id="aumCat" style="width:150px" aria-label="A qué categoría"><option value="">Todos</option><option>Servicio</option><option>Repuesto</option><option>Otro</option></select>
+   redondeando a <select id="aumRed" style="width:110px" aria-label="Redondeo"><option value="1">$1</option><option value="10">$10</option><option value="100" selected>$100</option><option value="500">$500</option><option value="1000">$1.000</option></select>
+   <button type="button" class="btn" id="aplicarAum">Aplicar</button>
+  </div>
+  <table>
+   <thead><tr><th style="width:130px">Categoría</th><th>Descripción</th><th style="width:160px">Precio ($)</th><th style="width:50px"></th></tr></thead>
+   <tbody id="tPrecios"></tbody>
+  </table>
+  <div class="help">Los cambios se guardan solos. Para editar en Excel: Exportar → modificar precios → guardar como CSV → Importar.</div>
+ </div>
+</section>
+
+<section id="trab" class="tab">
+ <div class="kpi" id="kpis"></div>
+ <div class="card" id="cajaCard" style="display:none">
+  <h2>💵 Caja de hoy</h2>
+  <div class="caja" id="cajaHoy"></div>
+ </div>
+ <div class="card" id="monoCard" style="display:none">
+  <h2>📊 Control del monotributo</h2>
+  <div id="monoTxt"></div>
+ </div>
+ <div class="card" id="recCard" style="display:none">
+  <h2>📅 Recordatorios de service</h2>
+  <div class="help" id="recHelp" style="margin-top:0;margin-bottom:6px"></div>
+  <div id="recList"></div>
+ </div>
+ <div class="card">
+  <h2>Trabajos y presupuestos guardados</h2>
+  <div class="row" style="margin-bottom:10px">
+   <input id="bTrab" placeholder="🔍 Cliente, moto, patente..." style="max-width:300px" aria-label="Buscar trabajos">
+   <select id="fEst" style="max-width:180px" aria-label="Estado"><option value="">Todos los estados</option></select>
+   <select id="fFact" style="max-width:170px" aria-label="Facturación"><option value="">Facturados y no</option><option value="si">Solo facturados</option><option value="no">Sin facturar</option></select>
+   <span style="flex:1"></span>
+   <button type="button" class="btn am" id="expTrab">⬇️ Exportar trabajos a Excel</button>
+  </div>
+  <div style="overflow:auto">
+  <table>
+   <thead><tr><th>Nº</th><th>Fecha</th><th>Cliente</th><th id="thMoto">Moto</th><th id="thPat">Patente</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead>
+   <tbody id="tTrab"></tbody>
+  </table>
+  </div>
+ </div>
+</section>
+
+<section id="conf" class="tab">
+ <div class="card">
+  <h2>Datos del negocio (salen en el presupuesto)</h2>
+  <div class="f">
+   <div><label for="kNombre">Nombre</label><input id="kNombre"></div>
+   <div><label for="kDir">Dirección</label><input id="kDir"></div>
+   <div><label for="kTel">Teléfono</label><input id="kTel"></div>
+   <div><label for="kRed">Instagram / Email</label><input id="kRed"></div>
+   <div><label for="kVal">Validez del presupuesto (días)</label><input id="kVal" type="number"></div>
+   <div><label for="kMeses">Recordar service a los (meses)</label><input id="kMeses" type="number" min="0"></div>
+   <div><label for="kNro">Próximo Nº de presupuesto</label><input id="kNro" type="number"></div>
+  </div>
+  <div style="margin-top:10px"><label for="kPie">Leyenda al pie</label><textarea id="kPie" rows="2"></textarea></div>
+  <div class="row" style="margin-top:10px">
+   <label class="btn lt" style="margin:0;color:#000;font-size:15px">🖼️ Cambiar logo<input type="file" id="kLogo" accept="image/*" hidden></label>
+   <button type="button" class="btn" id="kGuardar">Guardar datos</button>
+  </div>
+ </div>
+ <div class="card">
+  <h2>🧾 Facturación ARCA</h2>
+  <div class="f">
+   <div><label for="kCuit">CUIT del local (opcional)</label><input id="kCuit" inputmode="numeric" placeholder="20-12345678-9"></div>
+   <div><label for="kTope">Tope del Facturador ($)</label><input id="kTope" inputmode="numeric"></div>
+  </div>
+  <div class="f" style="margin-top:10px">
+   <div><label for="kUrlF">Link del Facturador</label><input id="kUrlF"></div>
+   <div><label for="kUrlC">Link para montos grandes (Comprobantes en línea)</label><input id="kUrlC"></div>
+  </div>
+  <div class="f" style="margin-top:10px">
+   <div><label for="kCat">Categoría de monotributo</label><select id="kCat"><option value="">No sé / no usar</option></select></div>
+   <div><label for="kTopeA">Tope anual de facturación de tu categoría ($)</label><input id="kTopeA" inputmode="numeric" placeholder="Lo ves en tu credencial de ARCA"></div>
+  </div>
+  <div class="row" style="margin-top:10px"><button type="button" class="btn" id="kFactG">Guardar</button></div>
+  <p class="help">Con la categoría y el tope anual, la app te muestra cuánto facturaste en los últimos 12 meses y te avisa antes de pasarte. ARCA actualiza los topes dos veces por año: cuando cambien, actualizalos acá (o pedíselo a tu contador). El Facturador de ARCA para monotributistas no se usa para operaciones mayores al tope del Facturador.</p>
+ </div>
+ <div class="card">
+  <h2>🔒 PIN de acceso</h2>
+  <p class="help" style="font-size:14px">Si ponés un PIN, la app lo pide cada vez que se abre en este dispositivo. Dejalo vacío para no usar PIN.</p>
+  <div class="row"><input id="kPin" type="password" inputmode="numeric" maxlength="6" placeholder="4 a 6 números" style="max-width:200px" autocomplete="new-password" aria-label="PIN nuevo">
+  <button type="button" class="btn" id="kPinG">Guardar PIN</button><span class="help" id="kPinE"></span></div>
+ </div>
+ <div class="card">
+  <h2>Copia de seguridad</h2>
+  <p class="help" style="font-size:14px">Todo se guarda en este dispositivo. Guardá una copia cada tanto en <b>Google Drive</b>, mandátela por <b>WhatsApp</b> o por mail: si cambiás o perdés el celular, con esa copia recuperás todo.</p>
+  <div class="row">
+   <button type="button" class="btn am" id="bkExp">☁️ Guardar copia (Drive, WhatsApp, mail)</button>
+   <button type="button" class="btn lt" id="bkDesc">⬇️ Descargar archivo</button>
+   <label class="btn lt" style="margin:0;color:#000;font-size:15px">📂 Restaurar copia<input type="file" id="bkImp" accept=".json,.txt,application/json,text/plain" hidden></label>
+   <button type="button" class="btn rd" id="bkReset">Restablecer lista de ejemplo</button>
+  </div>
+  <p class="help" id="estadoMem"></p>
+  <p class="help" id="ultCopia"></p>
+  <p class="help">Para restaurar en un celular nuevo: instalá la app, entrá a Ajustes → <b>Restaurar copia</b> y elegí el archivo desde Drive, Descargas o WhatsApp.</p>
+ </div>
+ <div class="card" id="soporteCard">
+  <h2>🛠️ Soporte</h2>
+  <p class="help" style="font-size:14px;margin-top:0" id="soporteTxt"></p>
+  <div class="row"><button type="button" class="btn wa" id="soporteWa">📲 Pedir ayuda por WhatsApp</button></div>
+ </div>
+ <div class="firma" id="firma"></div>
+</section>
+</main>
+
+<!-- Ventana Facturar -->
+<div id="fact" role="dialog" aria-modal="true" aria-labelledby="factTit">
+ <div class="box">
+  <div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h3 id="factTit">🧾 Facturar en ARCA</h3><button type="button" class="btn lt sm" id="fCerrar" aria-label="Cerrar">✕</button></div>
+  <div class="help" id="fSub" style="margin-top:0"></div>
+  <div class="paso"><div class="n">1</div><div class="c">
+    <b>Monto a facturar</b><br><span class="monto" id="fMonto"></span>
+    <div class="row"><button type="button" class="btn sm" id="fCopM">📋 Copiar monto</button><button type="button" class="btn lt sm" id="fCopD">📋 Copiar detalle</button></div>
+    <div class="det" id="fDet"></div>
+    <div class="warn" id="fWarn" style="display:none"></div>
+    <div class="help" id="fMono" style="display:none;font-size:13px"></div>
+  </div></div>
+  <div class="paso"><div class="n">2</div><div class="c">
+    <b>Abrí el Facturador y emití el tique</b>
+    <div class="help" style="font-size:13px">El monto ya queda copiado: en ARCA tocá el campo del importe, <b>mantené apretado → Pegar</b> (en la compu, Ctrl+V), y después <b>Facturar → Confirmar</b>.</div>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn az" id="fAbrir">Abrir Facturador ARCA ↗</button></div>
+  </div></div>
+  <div class="paso" style="border-bottom:none"><div class="n">3</div><div class="c">
+    <b>Cuando ARCA te confirme, marcalo acá</b>
+    <div class="f" style="margin-top:6px">
+     <div><label for="fNro">Nº de comprobante (opcional)</label><input id="fNro" placeholder="Ej: 00002-00000145"></div>
+     <div><label for="fFecha">Fecha de factura</label><input id="fFecha" type="date"></div>
+    </div>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn am" id="fMarcar">✔ Marcar como facturado</button><button type="button" class="btn lt sm" id="fDesm" style="display:none">Quitar marca</button></div>
+  </div></div>
+ </div>
+</div>
+
+<div id="wiz" class="modal" role="dialog" aria-modal="true" aria-labelledby="wizT">
+ <div class="box">
+  <h3 id="wizT">👋 ¡Bienvenido!</h3>
+  <p class="help" style="font-size:14px;margin-top:0">Completá los datos de tu negocio. Salen en los presupuestos y los podés cambiar cuando quieras en Ajustes.</p>
+  <div class="f" style="grid-template-columns:1fr">
+   <div><label for="wNombre">Nombre del negocio</label><input id="wNombre"></div>
+   <div><label for="wTel">Teléfono / WhatsApp</label><input id="wTel" inputmode="tel"></div>
+   <div><label for="wDir">Dirección</label><input id="wDir"></div>
+  </div>
+  <div class="wlogo"><img id="wLogoImg" alt="Logo"><label class="btn lt" style="margin:0;color:#000">🖼️ Subir logo<input type="file" id="wLogo" accept="image/*" hidden></label></div>
+  <div class="row" style="margin-top:16px;justify-content:flex-end"><button type="button" class="btn lt" id="wLuego">Después</button><button type="button" class="btn am" id="wOk">Empezar ✔</button></div>
+ </div>
+</div>
+
+<div id="print"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="lock"><img id="lockLogo" alt="Logo"><div style="font-weight:700">Ingresá el PIN</div>
+<input id="lockPin" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN">
+<button type="button" class="btn am" id="lockGo" style="min-width:160px">Entrar</button><div class="msg" id="lockMsg" aria-live="polite"></div></div>
+
+<script src="pdf.js"></script>
+<script>
+(function(){
+/* =====================================================================
+   CONFIGURACIÓN DEL CLIENTE — MR Production
+   Para un cliente nuevo: copiá la carpeta y cambiá SOLO este bloque
+   (más manifest.json e íconos). No hace falta tocar nada más.
+   ===================================================================== */
+const APP={
+  id:"mtms",                 // ÚNICO por cliente, sin espacios ni acentos (ej: "gomeria_pedro").
+                             // ⚠️ MT Moto Service usa "mtms": NO cambiarlo o la app no encuentra sus datos.
+  version:"5.0",
+  nombre:"MT Moto Service",  // nombre que aparece la primera vez (después el cliente lo edita en Ajustes)
+  archivo:"mtmotoservice",   // prefijo de los archivos de copia
+  colorPrincipal:"#F2E205",  // color de botones y detalles
+  colorOscuro:"#d9c800",
+  vehiculo:"Moto",           // "Moto", "Auto", "Bici", "Equipo"... ("" si el rubro no usa vehículo)
+  vehiculoEjemplo:"Honda Wave 110",
+  patente:"Patente",         // "Patente", "Nº de serie", "Cuadro"...
+  mesesService:6,            // a cuántos meses sugerir recordatorio de service (0 = desactivado)
+  diasCopia:15,              // cada cuántos días recordar la copia de seguridad
+  marca:"MR Production",
+  soporteWa:"",              // tu WhatsApp con código de país, ej: "5493434123456"
+  firmaEnPresupuesto:true    // agrega "Sistema: MR Production" chiquito al pie del presupuesto impreso
+};
+document.documentElement.style.setProperty("--am",APP.colorPrincipal);
+document.documentElement.style.setProperty("--am2",APP.colorOscuro);
+const LOGO_DEFAULT="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMTkwIj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE5MCIgcng9IjE4IiBmaWxsPSIjMTExIi8+PGNpcmNsZSBjeD0iMTIwIiBjeT0iOTUiIHI9Ijg4IiBmaWxsPSIjMWMxYzFjIi8+PHRleHQgeD0iMTIwIiB5PSIxMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxBcmlhbCxzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iOTAwIiBmb250LXN0eWxlPSJpdGFsaWMiIGZvbnQtc2l6ZT0iOTIiIGZpbGw9IiNGMkUyMDUiPk1UPC90ZXh0Pjx0ZXh0IHg9IjEyMCIgeT0iMTQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zdHlsZT0iaXRhbGljIiBmb250LXNpemU9IjI1IiBmaWxsPSIjZmZmIj5NT1RPIFNFUlZJQ0U8L3RleHQ+PC9zdmc+";
+const URL_FACT="https://facturador.afip.gob.ar";
+const URL_CEL="https://auth.afip.gob.ar/contribuyente_/login.xhtml";
+const ESTADOS=["Presupuestado","Aprobado","En taller","Terminado","Entregado","Rechazado"];
+const ECOL={"Presupuestado":"#e9e9e6","Aprobado":"#dbeafe","En taller":"#fff3cd","Terminado":"#d1fae5","Entregado":"#bbf7d0","Rechazado":"#fee2e2"};
+const $=s=>document.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,10);
+const money=n=>"$"+Math.round(Number(n)||0).toLocaleString("es-AR");
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hoy=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const fFecha=d=>d?d.split("-").reverse().join("/"):"";
+function toast(m,ms){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._t);t._t=setTimeout(()=>t.style.display="none",ms||2200)}
+function parsePrecio(v){let s=String(v??"").replace(/[$\s]/g,"");if(!s)return 0;
+  if(s.includes(",")){s=s.replace(/\./g,"").replace(",",".")}else if(/\.\d{3}($|\.)/.test(s)){s=s.replace(/\./g,"")}
+  const n=parseFloat(s);return isFinite(n)&&n>=0?n:0}
+
+const EJEMPLO=[
+["Servicio","Service completo 110cc",45000],["Servicio","Service completo 150cc",55000],["Servicio","Service completo 250cc",70000],
+["Servicio","Cambio de aceite (mano de obra)",8000],["Servicio","Rectificación motor 110cc",180000],["Servicio","Rectificación motor 125/150cc",220000],
+["Servicio","Rectificación motor 250cc",300000],["Servicio","Rectificación de tapa de cilindro",60000],["Servicio","Armado / desarme de motor",90000],
+["Servicio","Limpieza y regulación de carburador",25000],["Servicio","Cambio kit de transmisión (mano de obra)",15000],["Servicio","Cambio de pastillas de freno (mano de obra)",8000],
+["Servicio","Reparación de embrague",35000],["Servicio","Revisión eléctrica / diagnóstico",15000],["Servicio","Cambio de cubierta (mano de obra)",8000],
+["Servicio","Puesta a punto general",30000],
+["Repuesto","Aceite 4T 20W50 1L",12000],["Repuesto","Aceite 4T 10W40 semisintético 1L",16000],["Repuesto","Filtro de aceite",6000],
+["Repuesto","Filtro de aire 110cc",7000],["Repuesto","Bujía",5000],["Repuesto","Kit transmisión 110cc",38000],["Repuesto","Kit transmisión 150cc",48000],
+["Repuesto","Pastillas de freno delanteras",9000],["Repuesto","Zapatas de freno traseras",9000],["Repuesto","Cable de acelerador",6000],
+["Repuesto","Cable de embrague",6500],["Repuesto","Batería 12V 5Ah",45000],["Repuesto","Kit cilindro y pistón 110cc",75000],
+["Repuesto","Juego de aros 110cc",18000],["Repuesto","Juego de juntas motor 110cc",15000],["Repuesto","Cubierta trasera 2.75-17",48000],
+["Repuesto","Cámara 17\"",9000],["Repuesto","Lámpara faro delantero",3500],["Repuesto","Discos de embrague 110cc",22000]
+];
+const mkEjemplo=()=>EJEMPLO.map(([cat,nombre,precio])=>({id:uid(),cat,nombre,precio}));
+
+/* ---------- Guardado ---------- */
+const LS=APP.id+"_v1";
+let store=null,modoMem=false,avisoMostrado=false;
+try{const k="__mt_test";window.localStorage.setItem(k,"1");window.localStorage.removeItem(k);store=window.localStorage}catch(e){store=null}
+function mostrarAviso(tipo){
+  modoMem=true;$("#aviso").style.display="block";
+  if(tipo==="bloqueado"){
+    $("#avisoT").textContent="⚠️ Estás viendo la app en modo vista previa: no se van a guardar los cambios";
+    $("#avisoM").innerHTML="Esto pasa cuando el archivo se abre desde Teams, Outlook, OneDrive/SharePoint o una vista previa. <b>Solución:</b> descargá el archivo y abrilo con doble clic en <b>Chrome o Edge</b>, o usá el link publicado.";
+  }else{
+    $("#avisoT").textContent="⚠️ El navegador no tiene más lugar para guardar";
+    $("#avisoM").innerHTML="Descargá una copia y después borrá trabajos viejos ya entregados, o cambiá el logo por uno más liviano.";
+  }
+  if(!avisoMostrado){avisoMostrado=true;toast(tipo==="bloqueado"?"⚠️ Modo vista previa: los cambios no se guardan":"⚠️ Sin espacio para guardar",3500)}
+}
+function load(){if(!store)return null;try{const d=JSON.parse(store.getItem(LS));if(d&&d.catalogo)return d}catch(e){}return null}
+function save(){
+  if(!store){mostrarAviso("bloqueado");return false}
+  try{store.setItem(LS,JSON.stringify(S));return true}
+  catch(e){const q=e&&(e.name==="QuotaExceededError"||e.code===22||e.code===1014||/quota/i.test(e.message||""));mostrarAviso(q?"lleno":"bloqueado");return false}
+}
+let S=load()||{catalogo:mkEjemplo(),trabajos:[],conf:{nombre:APP.nombre,dir:"",tel:"",red:"",validez:7,nro:1,pie:"Presupuesto sujeto a revisión del vehículo. Los precios de repuestos pueden variar según disponibilidad.",logo:""},actual:null};
+// valores nuevos para datos guardados con versiones anteriores
+S.conf.urlFact=S.conf.urlFact||URL_FACT;S.conf.urlCel=S.conf.urlCel||URL_CEL;
+if(!(Number(S.conf.tope)>0))S.conf.tope=500000;if(S.conf.cuit==null)S.conf.cuit="";
+if(S.conf.meses==null)S.conf.meses=APP.mesesService;if(!S.conf.instalada)S.conf.instalada=hoy();
+if(S.conf.cat==null)S.conf.cat="";if(!(Number(S.conf.topeAnual)>=0))S.conf.topeAnual=0;if(S.trabajos.length)S.conf.configurada=true;
+if(!store)mostrarAviso("bloqueado");
+const logo=()=>S.conf.logo||LOGO_DEFAULT;
+function nuevoPres(){return{id:uid(),nro:S.conf.nro,fecha:hoy(),cliente:"",tel:"",moto:"",patente:"",items:[],pagos:[],desc:0,notas:"",estado:"Presupuestado",facturado:false,factNro:"",factFecha:""}}
+if(!S.actual)S.actual=nuevoPres();
+let P=S.actual;
+
+/* ---------- Pestañas ---------- */
+function irTab(t){document.querySelector('nav button[data-t="'+t+'"]').click()}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("act"));b.classList.add("act");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("act"));$("#"+b.dataset.t).classList.add("act");
+  if(b.dataset.t==="precios")renderPrecios();if(b.dataset.t==="trab")renderTrab();if(b.dataset.t==="pres")renderPick();if(b.dataset.t==="conf")renderMem();
+}));
+function renderHeader(){$("#hLogo").src=logo();const n=S.conf.nombre||"";const sp=n.indexOf(" ");
+  $("#hNombre").innerHTML=sp>0?esc(n.slice(0,sp))+" <span>"+esc(n.slice(sp+1))+"</span>":esc(n)}
+function renderMem(){const kb=Math.round(JSON.stringify(S).length*2/1024);
+  $("#estadoMem").textContent=modoMem?"Estado: ⚠️ sin guardado automático.":`Estado: ✔ guardado automático activo · uso aprox. ${kb} KB de ~5.000 KB disponibles.`}
+
+/* ---------- Selector ---------- */
+let catPick="";
+function renderChips(){$("#chipsPick").innerHTML=[["","Todos"],["Servicio","🔧 Servicios"],["Repuesto","⚙️ Repuestos"],["Otro","Otros"]]
+  .map(([v,t])=>`<span class="chip ${catPick===v?"act":""}" data-v="${v}" tabindex="0" role="button">${t}</span>`).join("")}
+$("#chipsPick").addEventListener("click",e=>{const c=e.target.closest(".chip");if(!c)return;catPick=c.dataset.v;renderChips();renderPick()});
+const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+function filtra(list,q,cat){const ws=norm(q).split(/\s+/).filter(Boolean);
+  return list.filter(i=>(!cat||i.cat===cat)&&ws.every(w=>norm(i.nombre+" "+i.cat).includes(w)))}
+function renderPick(){const l=filtra(S.catalogo,$("#buscar").value,catPick).sort((a,b)=>a.cat.localeCompare(b.cat)||a.nombre.localeCompare(b.nombre));
+  $("#pickList").innerHTML=l.length?l.map(i=>`<div class="pi" data-id="${i.id}"><div>${esc(i.nombre)}<small><span class="tag t-${i.cat}">${i.cat}</span></small></div><b>${money(i.precio)}</b></div>`).join(""):`<div class="empty">No hay resultados. Agregalo en "Precios".</div>`}
+$("#buscar").addEventListener("input",renderPick);
+$("#buscar").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();const f=$("#pickList .pi");if(f){f.click();$("#buscar").select()}}});
+$("#pickList").addEventListener("click",e=>{const d=e.target.closest(".pi");if(!d)return;const it=S.catalogo.find(x=>x.id===d.dataset.id);if(!it)return;
+  const ex=P.items.find(x=>x.ref===it.id);if(ex)ex.cant++;else P.items.push({id:uid(),ref:it.id,nombre:it.nombre,cat:it.cat,cant:1,precio:it.precio});
+  save();renderLineas();toast("✔ "+it.nombre)});
+
+/* ---------- Presupuesto ---------- */
+const campos={cCliente:"cliente",cTel:"tel",cMoto:"moto",cPat:"patente",cFecha:"fecha",cNotas:"notas"};
+function cargarForm(){if(!Array.isArray(P.pagos))P.pagos=[];$("#pNro").textContent=String(P.nro).padStart(4,"0");for(const k in campos)$("#"+k).value=P[campos[k]]||"";$("#cDesc").value=P.desc||0;renderLineas();renderFactEstado();renderHist()}
+for(const k in campos)$("#"+k).addEventListener("input",e=>{P[campos[k]]=e.target.value;save();if(k==="cPat"||k==="cTel")renderHist()});
+$("#cDesc").addEventListener("input",e=>{let v=parseFloat(e.target.value);P.desc=isFinite(v)?Math.min(100,Math.max(0,v)):0;save();totales()});
+function calc(p){const sub=p.items.reduce((a,i)=>a+(Number(i.cant)||0)*(Number(i.precio)||0),0);const d=sub*(Number(p.desc)||0)/100;return{sub,d,tot:sub-d}}
+function totales(){const t=calc(P);if(P.facturado)renderFactEstado();$("#tSub").textContent=money(t.sub);$("#tDesc").textContent="-"+money(t.d);$("#tTot").textContent=money(t.tot);
+  renderPagos();$("#mTot").textContent=money(t.tot);$("#mCnt").textContent=P.items.length?"("+P.items.length+" ítems)":""}
+function renderLineas(){
+  $("#lineas").innerHTML=P.items.length?P.items.map(i=>`<tr data-id="${i.id}">
+   <td><input data-k="nombre" value="${esc(i.nombre)}" aria-label="Descripción"></td>
+   <td><input data-k="cant" type="number" min="0" step="1" value="${i.cant}" aria-label="Cantidad"></td>
+   <td><input data-k="precio" inputmode="decimal" value="${Math.round(i.precio)}" aria-label="Precio unitario"></td>
+   <td class="num"><b>${money(i.cant*i.precio)}</b></td>
+   <td><button type="button" class="btn rd sm" data-del="1" title="Quitar" aria-label="Quitar">✕</button></td></tr>`).join(""):`<tr><td colspan="5" class="empty">Elegí ítems de la lista 👈</td></tr>`;
+  totales()}
+$("#lineas").addEventListener("input",e=>{const tr=e.target.closest("tr");const k=e.target.dataset.k;if(!tr||!k)return;const it=P.items.find(x=>x.id===tr.dataset.id);if(!it)return;
+  if(k==="nombre")it.nombre=e.target.value;else if(k==="cant"){const v=parseFloat(e.target.value);it.cant=isFinite(v)&&v>=0?v:0}else it.precio=parsePrecio(e.target.value);
+  tr.querySelector(".num b").textContent=money(it.cant*it.precio);save();totales()});
+$("#lineas").addEventListener("click",e=>{if(!e.target.dataset.del)return;const tr=e.target.closest("tr");P.items=P.items.filter(x=>x.id!==tr.dataset.id);save();renderLineas()});
+$("#addLibre").addEventListener("click",()=>{P.items.push({id:uid(),ref:null,nombre:"",cat:"Otro",cant:1,precio:0});save();renderLineas();const ins=$("#lineas").querySelectorAll('input[data-k="nombre"]');ins[ins.length-1].focus()});
+
+function guardarTrabajo(silencioso){
+  if(!P.items.length){toast("⚠️ Agregá al menos un ítem");return false}
+  const i=S.trabajos.findIndex(t=>t.id===P.id);const copia=JSON.parse(JSON.stringify(P));copia.total=calc(P).tot;
+  if(i>=0)S.trabajos[i]=copia;else{S.trabajos.unshift(copia);if(P.nro>=S.conf.nro)S.conf.nro=P.nro+1}
+  const ok=save();if(!silencioso)toast(ok?"💾 Guardado en Trabajos":"⚠️ Agregado a Trabajos, pero no queda guardado (ver aviso arriba)",3500);return true}
+$("#bGuardar").addEventListener("click",()=>guardarTrabajo());
+$("#bNuevo").addEventListener("click",()=>{if(P.items.length&&!S.trabajos.some(t=>t.id===P.id)&&!confirm("Este presupuesto no está guardado. ¿Empezar uno nuevo igual?"))return;
+  S.actual=P=nuevoPres();save();cargarForm();$("#buscar").value="";renderPick();$("#cCliente").focus()});
+
+/* ---------- Impresión ---------- */
+function htmlPrint(p){const c=S.conf,t=calc(p);
+ return `<div class="ph"><img src="${logo()}" alt=""><div><h2>${esc(c.nombre)}</h2><div>${esc(c.dir)}</div><div>${esc(c.tel)} ${c.red?" · "+esc(c.red):""}</div></div>
+ <div class="nro"><div style="font-size:18px;font-weight:800">PRESUPUESTO</div><div>Nº ${String(p.nro).padStart(4,"0")}</div><div>Fecha: ${fFecha(p.fecha)}</div></div></div>
+ <div class="pbox"><div><b>Cliente:</b> ${esc(p.cliente)}</div><div><b>Teléfono:</b> ${esc(p.tel)}</div>${APP.vehiculo?`<div><b>${esc(APP.vehiculo)}:</b> ${esc(p.moto)}</div><div><b>${esc(APP.patente)}:</b> ${esc(p.patente)}</div>`:""}</div>
+ <table><thead><tr><th>Descripción</th><th class="num">Cant.</th><th class="num">Precio unit.</th><th class="num">Subtotal</th></tr></thead><tbody>
+ ${p.items.map(i=>`<tr><td>${esc(i.nombre)}</td><td class="num">${i.cant}</td><td class="num">${money(i.precio)}</td><td class="num">${money(i.cant*i.precio)}</td></tr>`).join("")}
+ </tbody></table>
+ <div class="tot"><div><span>Subtotal</span><b>${money(t.sub)}</b></div>${p.desc>0?`<div><span>Descuento ${p.desc}%</span><b>-${money(t.d)}</b></div>`:""}<div class="big"><span>TOTAL</span><span>${money(t.tot)}</span></div>${pagado(p)>0?`<div><span>Pagado</span><b>${money(pagado(p))}</b></div><div><span>Saldo</span><b>${money(Math.max(0,t.tot-pagado(p)))}</b></div>`:""}</div>
+ ${p.notas?`<p><b>Observaciones:</b> ${esc(p.notas)}</p>`:""}
+ <div class="pfoot">Documento no válido como factura. Validez: ${c.validez||7} días desde la fecha de emisión. ${esc(c.pie)}${APP.firmaEnPresupuesto?`<div style="margin-top:6px;color:#999;font-size:9px">Sistema: ${esc(APP.marca)}</div>`:""}</div>`}
+function imprimir(p){$("#print").innerHTML=htmlPrint(p);const img=$("#print img");const go=()=>setTimeout(()=>{try{window.print()}catch(e){toast("⚠️ No se puede imprimir en vista previa.",4000)}},50);if(img.complete)go();else img.onload=go}
+$("#bPrint").addEventListener("click",()=>{if(!P.items.length){toast("⚠️ Agregá al menos un ítem");return}imprimir(P)});
+
+/* ---------- Copiar al portapapeles ---------- */
+async function copiar(txt){
+  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(txt);return true}}catch(e){}
+  try{const ta=document.createElement("textarea");ta.value=txt;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,txt.length);const ok=document.execCommand("copy");ta.remove();return ok}catch(e){return false}
+}
+function abrir(url){let w=null;try{w=window.open(url,"_blank","noopener")}catch(e){}
+  if(!w){try{const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove()}catch(e){}}}
+
+/* ---------- WhatsApp ---------- */
+function textoWa(p){const t=calc(p),c=S.conf;let s=`*${c.nombre}*\nPresupuesto Nº ${String(p.nro).padStart(4,"0")} - ${fFecha(p.fecha)}\n`;
+  if(p.cliente)s+=`Cliente: ${p.cliente}\n`;if(p.moto)s+=`${APP.vehiculo||"Detalle"}: ${p.moto}${p.patente?" ("+p.patente+")":""}\n`;s+="\n";
+  p.items.forEach(i=>s+=`• ${i.cant>1?i.cant+" x ":""}${i.nombre}: ${money(i.cant*i.precio)}\n`);
+  if(p.desc>0)s+=`\nDescuento ${p.desc}%: -${money(t.d)}`;s+=`\n*TOTAL: ${money(t.tot)}*\n`;const pg=pagado(p);if(pg>0)s+=`Pagado: ${money(pg)} · *Saldo: ${money(Math.max(0,t.tot-pg))}*\n`;if(p.notas)s+=`\n${p.notas}\n`;s+=`\nVálido por ${c.validez||7} días.`;return s}
+function telWa(t){let d=String(t||"").replace(/\D/g,"");if(!d)return"";if(d.startsWith("0"))d=d.slice(1);if(d.startsWith("54"))return d;if(d.length===10)return"549"+d;return d}
+$("#bWa").addEventListener("click",()=>{
+  if(!P.items.length){toast("⚠️ Agregá al menos un ítem");return}
+  guardarTrabajo(true);const txt=textoWa(P);
+  abrir(`https://wa.me/${telWa(P.tel)}?text=${encodeURIComponent(txt)}`);copiar(txt);
+  toast(modoMem?"📲 Abriendo WhatsApp… (no queda guardado, ver aviso)":"📲 Abriendo WhatsApp… (texto también copiado)",3500)});
+
+/* ---------- FACTURAR EN ARCA ---------- */
+let FX=null; // trabajo que se está facturando
+const montoTxt=n=>{const r=Math.round(n*100)/100;return Number.isInteger(r)?String(r):r.toFixed(2).replace(".",",")};
+function detalleFact(p){return p.items.map(i=>`${i.cant>1?i.cant+" x ":""}${i.nombre}`).join(", ")+(p.moto?` - ${p.moto}`:"")+(p.patente?` (${p.patente})`:"")}
+function renderFactEstado(){const e=$("#factEstado");
+  if(P.facturado){e.style.display="block";const fm=Number(P.factMonto)||0,dif=fm&&Math.abs(fm-calc(P).tot)>=1;
+    e.style.background=dif?"#fff3cd":"#dbeafe";e.style.color=dif?"#7a5b00":"";
+    e.textContent=`✔ Facturado ${fm?money(fm)+" ":""}${P.factFecha?"el "+fFecha(P.factFecha):""}${P.factNro?" · Comprobante "+P.factNro:""}`+(dif?` — ⚠️ El presupuesto cambió después de facturar (hoy da ${money(calc(P).tot)})`:"")}else e.style.display="none"}
+function abrirFact(p){
+  if(!p.items.length){toast("⚠️ Agregá al menos un ítem");return}
+  const t=calc(p).tot;if(!(t>0)){toast("⚠️ El total tiene que ser mayor a $0");return}
+  FX=p;
+  $("#fSub").textContent=`Presupuesto Nº ${String(p.nro).padStart(4,"0")}${p.cliente?" · "+p.cliente:""}`;
+  $("#fMonto").textContent=money(t);$("#fDet").textContent=detalleFact(p);
+  const tope=Number(S.conf.tope)||500000,w=$("#fWarn");
+  if(t>tope){w.style.display="block";w.innerHTML=`⚠️ Este monto supera el tope del Facturador (${money(tope)}). Para este caso usá <b>Comprobantes en línea</b> con clave fiscal: el botón de abajo te lleva ahí.`;$("#fAbrir").textContent="Abrir Comprobantes en línea ↗";$("#fAbrir").dataset.url=S.conf.urlCel}
+  else if(catAlta()){w.style.display="block";w.innerHTML=`ℹ️ Tu categoría (${esc(S.conf.cat)}) no usa el Facturador simplificado (es para categorías A, B y C). Usá <b>Comprobantes en línea</b> con clave fiscal.`;$("#fAbrir").textContent="Abrir Comprobantes en línea ↗";$("#fAbrir").dataset.url=S.conf.urlCel}
+  else{w.style.display="none";$("#fAbrir").textContent="Abrir Facturador ARCA ↗";$("#fAbrir").dataset.url=S.conf.urlFact}
+  const mo=$("#fMono"),ta=Number(S.conf.topeAnual)||0;
+  if(ta>0&&!p.facturado){const pc=Math.round((facturado12()+t)/ta*100);mo.style.display="block";mo.innerHTML=`📊 Con esta factura llegás al <b>${pc}%</b> del tope anual de tu categoría${pc>=80?" — ⚠️ consultá con tu contador por la recategorización":""}.`}else mo.style.display="none";
+  $("#fNro").value=p.factNro||"";$("#fFecha").value=p.factFecha||hoy();
+  $("#fMarcar").textContent=p.facturado?"✔ Actualizar datos":"✔ Marcar como facturado";$("#fDesm").style.display=p.facturado?"inline-block":"none";
+  $("#fact").classList.add("on");setTimeout(()=>$("#fAbrir").focus(),50)}
+function cerrarFact(){$("#fact").classList.remove("on");FX=null}
+$("#bFact").addEventListener("click",()=>{if(!guardarTrabajo(true))return;abrirFact(P)});
+$("#fCerrar").addEventListener("click",cerrarFact);
+$("#fact").addEventListener("click",e=>{if(e.target.id==="fact")cerrarFact()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#fact").classList.contains("on"))cerrarFact()});
+$("#fCopM").addEventListener("click",async()=>{if(!FX)return;toast(await copiar(montoTxt(calc(FX).tot))?"📋 Monto copiado: "+montoTxt(calc(FX).tot):"⚠️ No se pudo copiar, escribilo a mano")});
+$("#fCopD").addEventListener("click",async()=>{if(!FX)return;toast(await copiar(detalleFact(FX))?"📋 Detalle copiado":"⚠️ No se pudo copiar")});
+$("#fAbrir").addEventListener("click",async()=>{if(!FX)return;const ok=await copiar(montoTxt(calc(FX).tot));abrir($("#fAbrir").dataset.url);
+  toast(ok?"📋 Monto copiado. Pegalo en ARCA":"Abriendo ARCA…",3500)});
+function aplicarFact(id,datos){
+  [S.trabajos.find(t=>t.id===id),P.id===id?P:null,FX&&FX.id===id?FX:null].forEach(o=>{if(o)Object.assign(o,datos)});
+  save();renderFactEstado();if($("#trab").classList.contains("act"))renderTrab()}
+$("#fMarcar").addEventListener("click",()=>{if(!FX)return;
+  aplicarFact(FX.id,{facturado:true,factNro:$("#fNro").value.trim(),factFecha:$("#fFecha").value||hoy(),factMonto:calc(FX).tot});
+  cerrarFact();toast("✔ Marcado como facturado")});
+$("#fDesm").addEventListener("click",()=>{if(!FX||!confirm("¿Quitar la marca de facturado? (No anula nada en ARCA)"))return;
+  aplicarFact(FX.id,{facturado:false,factNro:"",factFecha:"",factMonto:0});cerrarFact();toast("Marca quitada")});
+
+/* ---------- Lista de precios ---------- */
+function renderPrecios(){const l=filtra(S.catalogo,$("#bPrecio").value,$("#fCat").value);
+  $("#tPrecios").innerHTML=l.length?l.map(i=>`<tr data-id="${i.id}">
+   <td><select data-k="cat" aria-label="Categoría">${["Servicio","Repuesto","Otro"].map(c=>`<option ${c===i.cat?"selected":""}>${c}</option>`).join("")}</select></td>
+   <td><input data-k="nombre" value="${esc(i.nombre)}" aria-label="Descripción"></td>
+   <td><input data-k="precio" inputmode="decimal" value="${Math.round(i.precio)}" aria-label="Precio"></td>
+   <td><button type="button" class="btn rd sm" data-del="1" aria-label="Borrar">✕</button></td></tr>`).join(""):`<tr><td colspan="4" class="empty">Sin ítems</td></tr>`}
+$("#bPrecio").addEventListener("input",renderPrecios);$("#fCat").addEventListener("change",renderPrecios);
+$("#tPrecios").addEventListener("input",e=>{const tr=e.target.closest("tr"),k=e.target.dataset.k;if(!tr||!k||k==="cat")return;const it=S.catalogo.find(x=>x.id===tr.dataset.id);if(!it)return;
+  it[k]=k==="precio"?parsePrecio(e.target.value):e.target.value;save()});
+$("#tPrecios").addEventListener("change",e=>{if(e.target.dataset.k==="cat"){const it=S.catalogo.find(x=>x.id===e.target.closest("tr").dataset.id);it.cat=e.target.value;save()}});
+$("#tPrecios").addEventListener("click",e=>{if(!e.target.dataset.del)return;const id=e.target.closest("tr").dataset.id;const it=S.catalogo.find(x=>x.id===id);
+  if(confirm(`¿Borrar "${it.nombre}"?`)){S.catalogo=S.catalogo.filter(x=>x.id!==id);save();renderPrecios()}});
+$("#nuevoItem").addEventListener("click",()=>{const it={id:uid(),cat:$("#fCat").value||"Servicio",nombre:"",precio:0};S.catalogo.unshift(it);$("#bPrecio").value="";save();renderPrecios();
+  $('#tPrecios tr[data-id="'+it.id+'"] input[data-k="nombre"]').focus()});
+$("#aplicarAum").addEventListener("click",()=>{const pct=parseFloat($("#aumPct").value),cat=$("#aumCat").value,r=Number($("#aumRed").value)||1;
+  if(!isFinite(pct)||pct<=-100||pct>1000){toast("⚠️ Porcentaje inválido");return}
+  const l=S.catalogo.filter(i=>!cat||i.cat===cat);if(!confirm(`¿Aplicar ${pct}% a ${l.length} ítems${cat?" ("+cat+")":""}?`))return;
+  l.forEach(i=>i.precio=Math.max(0,Math.round(i.precio*(1+pct/100)/r)*r));save();renderPrecios();toast("✔ Precios actualizados")});
+
+/* ---------- CSV ---------- */
+function descargar(nombre,contenido,tipo){const b=new Blob([contenido],{type:tipo});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=nombre;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const cq=v=>{const s=String(v??"");return/[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+const toCSV=rows=>"\uFEFF"+rows.map(r=>r.map(cq).join(";")).join("\r\n");
+function parseCSV(txt){txt=txt.replace(/^\uFEFF/,"");const first=txt.split(/\r?\n/)[0]||"";const sep=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?";":",";
+  const rows=[];let row=[],f="",q=false;for(let i=0;i<txt.length;i++){const c=txt[i];
+   if(q){if(c==='"'){if(txt[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+   else if(c==='"')q=true;else if(c===sep){row.push(f);f=""}else if(c==="\n"){row.push(f);rows.push(row);row=[];f=""}else if(c!=="\r")f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}return rows.filter(r=>r.some(x=>x.trim()))}
+$("#expCSV").addEventListener("click",()=>descargar("lista_precios_"+hoy()+".csv",toCSV([["Categoria","Descripcion","Precio"],...S.catalogo.map(i=>[i.cat,i.nombre,Math.round(i.precio)])]),"text/csv;charset=utf-8"));
+$("#impCSV").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{
+  let rows=parseCSV(r.result);if(rows.length&&/categ/i.test(rows[0][0]||""))rows=rows.slice(1);
+  const nuevos=rows.filter(x=>(x[1]||"").trim()).map(x=>({id:uid(),cat:["Servicio","Repuesto","Otro"].find(c=>norm(c)===norm((x[0]||"").trim()))||"Otro",nombre:x[1].trim(),precio:parsePrecio(x[2])}));
+  if(!nuevos.length){toast("⚠️ No encontré ítems. Columnas: Categoria;Descripcion;Precio");return}
+  const reemplazar=confirm(`Encontré ${nuevos.length} ítems.\n\nACEPTAR = reemplazar toda la lista\nCANCELAR = actualizar precios y sumar los nuevos`);
+  if(reemplazar)S.catalogo=nuevos;else nuevos.forEach(n=>{const ex=S.catalogo.find(i=>norm(i.nombre)===norm(n.nombre));if(ex){ex.precio=n.precio;ex.cat=n.cat}else S.catalogo.push(n)});
+  save();renderPrecios();toast("✔ Lista importada")};r.readAsText(f,"utf-8");e.target.value=""});
+
+/* ---------- Trabajos ---------- */
+$("#fEst").innerHTML+=ESTADOS.map(e=>`<option>${e}</option>`).join("");
+function renderTrab(){const q=norm($("#bTrab").value),fe=$("#fEst").value,ff=$("#fFact").value;
+  const l=S.trabajos.filter(t=>(!fe||t.estado===fe)&&(!ff||(ff==="si")===!!t.facturado)&&norm([t.nro,t.cliente,t.moto,t.patente,t.tel,t.factNro].join(" ")).includes(q));
+  $("#tTrab").innerHTML=l.length?l.map(t=>`<tr data-id="${t.id}"><td><b>${String(t.nro).padStart(4,"0")}</b></td><td>${fFecha(t.fecha)}</td><td>${esc(t.cliente)}</td><td>${esc(t.moto)}</td><td>${esc(t.patente)}</td>
+   <td class="num"><b>${money(t.total)}</b></td>
+   <td><div class="row" style="flex-wrap:nowrap"><select class="est" data-est="1" style="background:${ECOL[t.estado]}" aria-label="Estado">${ESTADOS.map(e=>`<option ${e===t.estado?"selected":""}>${e}</option>`).join("")}</select>
+     ${t.facturado?`<span class="tag t-fact" title="${esc(t.factNro)}">🧾 Facturado</span>`:`<span class="tag t-nofact">Sin facturar</span>`}${tagPago(t)}</div></td>
+   <td><div class="row" style="flex-wrap:nowrap"><button type="button" class="btn sm" data-a="abrir">Abrir</button><button type="button" class="btn az sm" data-a="fact" title="Facturar en ARCA" aria-label="Facturar">🧾</button><button type="button" class="btn am sm" data-a="pdf" title="Enviar PDF" aria-label="Enviar PDF">📄</button><button type="button" class="btn lt sm" data-a="print" title="Imprimir" aria-label="Imprimir">🖨️</button><button type="button" class="btn lt sm" data-a="dup" title="Duplicar" aria-label="Duplicar">⧉</button><button type="button" class="btn rd sm" data-a="del" title="Borrar" aria-label="Borrar">✕</button></div></td></tr>`).join("")
+   :`<tr><td colspan="8" class="empty">Todavía no hay trabajos guardados.</td></tr>`;
+  const cnt=e=>S.trabajos.filter(t=>t.estado===e).length;const mes=hoy().slice(0,7);
+  const factMes=S.trabajos.filter(t=>t.facturado&&(t.factFecha||t.fecha||"").startsWith(mes));
+  const pend=S.trabajos.filter(t=>!t.facturado&&t.estado==="Entregado").length;
+  $("#kpis").innerHTML=`<div>Presupuestados<b>${cnt("Presupuestado")}</b></div><div>En taller<b>${cnt("En taller")+cnt("Aprobado")}</b></div><div>Terminados (a entregar)<b>${cnt("Terminado")}</b></div><div>Facturado este mes<b>${money(factMes.reduce((a,t)=>a+(Number(t.factMonto)||t.total),0))}</b></div><div>Entregados sin facturar<b>${pend}</b></div>`}
+renderTrab=(f=>function(){f();renderRec();renderCaja();renderMono()})(renderTrab);
+$("#bTrab").addEventListener("input",renderTrab);$("#fEst").addEventListener("change",renderTrab);$("#fFact").addEventListener("change",renderTrab);
+$("#tTrab").addEventListener("change",e=>{if(!e.target.dataset.est)return;const t=S.trabajos.find(x=>x.id===e.target.closest("tr").dataset.id);t.estado=e.target.value;if(P.id===t.id)P.estado=t.estado;save();renderTrab()});
+$("#tTrab").addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;const t=S.trabajos.find(x=>x.id===b.closest("tr").dataset.id);if(!t)return;
+  if(a==="abrir"){S.actual=P=JSON.parse(JSON.stringify(t));save();cargarForm();irTab("pres")}
+  if(a==="fact")abrirFact(t);
+  if(a==="print")imprimir(t);
+  if(a==="pdf")compartirPDF(t);
+  if(a==="dup"){const n=JSON.parse(JSON.stringify(t));Object.assign(n,{id:uid(),nro:S.conf.nro,fecha:hoy(),pagos:[],estado:"Presupuestado",facturado:false,factNro:"",factFecha:"",factMonto:0});S.actual=P=n;save();cargarForm();irTab("pres");toast("Copia creada, editala y guardala")}
+  if(a==="del"&&confirm(`¿Borrar presupuesto Nº ${t.nro} de ${t.cliente||"sin nombre"}?`)){S.trabajos=S.trabajos.filter(x=>x.id!==t.id);save();renderTrab()}});
+$("#expTrab").addEventListener("click",()=>{const rows=[["Nro","Fecha","Cliente","Telefono",APP.vehiculo||"Vehiculo",APP.patente||"Patente","Detalle","Subtotal","Descuento %","Total","Estado","Facturado","Monto facturado","Nro comprobante","Fecha factura","Observaciones"]];
+  S.trabajos.forEach(t=>{const c=calc(t);rows.push([t.nro,fFecha(t.fecha),t.cliente,t.tel,t.moto,t.patente,t.items.map(i=>`${i.cant} x ${i.nombre}`).join(" | "),Math.round(c.sub),t.desc||0,Math.round(c.tot),t.estado,t.facturado?"SI":"NO",t.facturado?Math.round(Number(t.factMonto)||c.tot):"",t.factNro||"",fFecha(t.factFecha||""),t.notas])});
+  descargar("trabajos_"+hoy()+".csv",toCSV(rows),"text/csv;charset=utf-8")});
+
+/* ---------- Ajustes ---------- */
+const kc={kNombre:"nombre",kDir:"dir",kTel:"tel",kRed:"red",kVal:"validez",kNro:"nro",kPie:"pie"};
+function cargarConf(){for(const k in kc)$("#"+k).value=S.conf[kc[k]]??"";$("#kCat").value=S.conf.cat||"";$("#kTopeA").value=Number(S.conf.topeAnual)>0?Math.round(S.conf.topeAnual):"";$("#kMeses").value=S.conf.meses;$("#kCuit").value=S.conf.cuit||"";$("#kTope").value=S.conf.tope;$("#kUrlF").value=S.conf.urlFact;$("#kUrlC").value=S.conf.urlCel}
+$("#kGuardar").addEventListener("click",()=>{for(const k in kc){let v=$("#"+k).value;if(k==="kVal"||k==="kNro"){v=parseInt(v);if(!isFinite(v)||v<1)v=k==="kVal"?7:1}S.conf[kc[k]]=v}
+  let m=parseInt($("#kMeses").value);S.conf.meses=isFinite(m)&&m>=0?m:APP.mesesService;
+  if(!S.trabajos.some(t=>t.id===P.id)){P.nro=S.conf.nro;$("#pNro").textContent=String(P.nro).padStart(4,"0")}const ok=save();renderHeader();cargarConf();toast(ok?"✔ Datos guardados":"⚠️ No se pudo guardar (ver aviso arriba)")});
+const urlOk=u=>/^https:\/\/\S+$/i.test(u);
+$("#kFactG").addEventListener("click",()=>{const tope=parsePrecio($("#kTope").value),uf=$("#kUrlF").value.trim(),uc=$("#kUrlC").value.trim();
+  if(!(tope>0)){toast("⚠️ Tope inválido");return}if(!urlOk(uf)||!urlOk(uc)){toast("⚠️ Los links tienen que empezar con https://");return}
+  Object.assign(S.conf,{cuit:$("#kCuit").value.trim(),tope,urlFact:uf,urlCel:uc,cat:$("#kCat").value,topeAnual:parsePrecio($("#kTopeA").value)});save();cargarConf();toast("✔ Facturación guardada")});
+function cargarLogo(f,cb){if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{
+  const m=260,s=Math.min(1,m/Math.max(im.width,im.height)),cv=document.createElement("canvas");cv.width=Math.round(im.width*s);cv.height=Math.round(im.height*s);
+  const cx=cv.getContext("2d");cx.fillStyle="#000";cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0,cv.width,cv.height);
+  S.conf.logo=cv.toDataURL("image/jpeg",0.85);const ok=save();renderHeader();prepLogo();if(cb)cb();toast(ok?"✔ Logo actualizado":"⚠️ Logo cambiado pero no guardado")};im.src=r.result};r.readAsDataURL(f)}
+$("#kLogo").addEventListener("change",e=>{cargarLogo(e.target.files[0]);e.target.value=""});
+function copiaHecha(){S.conf.ultimaCopia=hoy();S.conf.copiaPosp="";save();revisarCopia();renderUltCopia()}
+function backupDescargar(){descargar("copia_"+APP.archivo+"_"+hoy()+".json",JSON.stringify(S),"application/json");copiaHecha()}
+async function backup(){const nom="copia_"+APP.archivo+"_"+hoy()+".json",json=JSON.stringify(S);
+  if(esCel()&&navigator.canShare){for(const tipo of["application/json","text/plain"]){let f;try{f=new File([json],nom,{type:tipo})}catch(e){break}
+    if(navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:"Copia de "+S.conf.nombre});copiaHecha();toast("✔ Copia enviada");return}
+      catch(e){if(e&&e.name==="AbortError")return;break}}}}
+  backupDescargar();toast(esCel()?"💾 Copia descargada: subila a Drive o mandátela por WhatsApp":"💾 Copia descargada",4000)}
+$("#bkExp").addEventListener("click",backup);$("#bkDesc").addEventListener("click",()=>{backupDescargar();toast("💾 Copia descargada")});$("#avisoBk").addEventListener("click",backup);
+$("#bkImp").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.catalogo||!d.conf)throw 0;
+  if(!confirm("Esto reemplaza todos los datos actuales por los de la copia. ¿Seguir?"))return;
+  const pinActual=S.conf.pin;S=d;if(!S.trabajos)S.trabajos=[];if(!S.actual)S.actual=nuevoPres();
+  S.conf.urlFact=S.conf.urlFact||URL_FACT;S.conf.urlCel=S.conf.urlCel||URL_CEL;if(!(Number(S.conf.tope)>0))S.conf.tope=500000;
+  if(pinActual&&!S.conf.pin)S.conf.pin=pinActual;if(S.conf.meses==null)S.conf.meses=APP.mesesService;if(!S.conf.instalada)S.conf.instalada=hoy();
+  if(S.conf.cat==null)S.conf.cat="";if(!(Number(S.conf.topeAnual)>=0))S.conf.topeAnual=0;S.conf.configurada=true;S.conf.ultimaCopia=hoy();P=S.actual;save();init();toast("✔ Copia restaurada")}catch(x){toast("⚠️ Archivo de copia inválido")}};r.readAsText(f);e.target.value=""});
+$("#bkReset").addEventListener("click",()=>{if(confirm("¿Reemplazar la lista de precios por la de ejemplo? (los trabajos no se tocan)")){S.catalogo=mkEjemplo();save();renderPrecios();renderPick();toast("Lista de ejemplo cargada")}});
+
+/* ---------- PIN ---------- */
+async function hashPin(p){const t=APP.id+"|"+p;try{if(window.crypto&&crypto.subtle){const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,"0")).join("")}}catch(e){}
+  let h=5381;for(const c of t)h=((h<<5)+h+c.charCodeAt(0))|0;return"d"+(h>>>0).toString(16)}
+function pinEstado(){$("#kPinE").textContent=S.conf.pin?"✔ PIN activo":"Sin PIN"}
+$("#kPinG").addEventListener("click",async()=>{const v=$("#kPin").value.trim();
+  if(v&&!/^\d{4,6}$/.test(v)){toast("⚠️ El PIN tiene que tener 4 a 6 números");return}
+  if(!v&&S.conf.pin&&!confirm("¿Quitar el PIN?"))return;
+  S.conf.pin=v?await hashPin(v):"";save();$("#kPin").value="";pinEstado();toast(v?"🔒 PIN guardado":"PIN quitado")});
+let intentos=0;
+async function probarPin(){const v=$("#lockPin").value.trim();if(!v)return;
+  if(await hashPin(v)===S.conf.pin){$("#lock").classList.remove("on");$("#lockPin").value="";$("#lockMsg").textContent="";intentos=0}
+  else{intentos++;$("#lockPin").value="";$("#lockMsg").textContent="PIN incorrecto"+(intentos>=3?" ("+intentos+" intentos)":"");$("#lockPin").focus()}}
+$("#lockGo").addEventListener("click",probarPin);
+$("#lockPin").addEventListener("keydown",e=>{if(e.key==="Enter")probarPin()});
+function bloquear(){if(!S.conf.pin)return;$("#lockLogo").src=logo();$("#lock").classList.add("on");setTimeout(()=>$("#lockPin").focus(),100)}
+let ocultoDesde=0;
+document.addEventListener("visibilitychange",()=>{if(document.hidden)ocultoDesde=Date.now();else if(ocultoDesde&&Date.now()-ocultoDesde>5*60*1000)bloquear()});
+$("#mVer").addEventListener("click",()=>$("#lineas").scrollIntoView({behavior:"smooth",block:"start"}));
+if("serviceWorker" in navigator){const habia=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(habia)$("#updBanner").classList.add("on")})}
+$("#updGo").addEventListener("click",()=>location.reload());
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){try{navigator.serviceWorker.register("sw.js?app="+encodeURIComponent(APP.id)).catch(()=>{})}catch(e){}}
+
+/* ---------- Funciones v4: historial, recordatorios, copia, rubro ---------- */
+const diasEntre=(a,b)=>Math.round((new Date(b+"T12:00")-new Date(a+"T12:00"))/864e5);
+const normPat=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+const tel8=s=>String(s||"").replace(/\D/g,"").slice(-8);
+function claveVeh(t){const pt=normPat(t.patente);if(pt.length>=3)return"P"+pt;const tl=tel8(t.tel);return tl.length===8?"T"+tl:""}
+function previos(p){const pt=normPat(p.patente),tl=tel8(p.tel);
+  return S.trabajos.filter(t=>t.id!==p.id&&((pt.length>=3&&normPat(t.patente)===pt)||(pt.length<3&&tl.length===8&&tel8(t.tel)===tl)))
+   .sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""))}
+function renderHist(){const h=$("#hist"),l=previos(P);if(!l.length){h.classList.remove("on");return}
+  const u=l[0],det=u.items.slice(0,3).map(i=>i.nombre).join(", ")+(u.items.length>3?"…":"");
+  const falta=(!P.cliente&&u.cliente)||(!P.tel&&u.tel)||(!P.moto&&u.moto);
+  h.innerHTML=`🕘 <b>${l.length===1?"Ya vino 1 vez":"Ya vino "+l.length+" veces"}</b>${u.cliente?" · "+esc(u.cliente):""}<br>
+   Último: ${fFecha(u.fecha)} — ${esc(det)} (${money(u.total)}) · <i>${esc(u.estado)}</i>
+   <div class="row">${falta?`<button type="button" class="btn sm az" id="histFill">Completar datos del cliente</button>`:""}<button type="button" class="btn sm lt" id="histVer">Ver historial</button></div>`;
+  h.classList.add("on")}
+$("#hist").addEventListener("click",e=>{const u=previos(P)[0];if(!u)return;
+  if(e.target.id==="histFill"){["cliente","tel","moto","patente"].forEach(k=>{if(!P[k]&&u[k])P[k]=u[k]});save();cargarForm();toast("✔ Datos completados")}
+  if(e.target.id==="histVer"){$("#bTrab").value=normPat(P.patente).length>=3?P.patente:P.tel;$("#fEst").value="";$("#fFact").value="";irTab("trab")}});
+
+function pendientesRec(){const meses=Number(S.conf.meses)||0;if(!meses)return[];const g={};
+  S.trabajos.forEach(t=>{if(t.estado==="Rechazado")return;const k=claveVeh(t);if(!k)return;if(!g[k]||(t.fecha||"")>(g[k].fecha||""))g[k]=t});
+  return Object.values(g).filter(t=>t.estado==="Entregado"&&tel8(t.tel).length===8&&!t.recordado&&t.fecha&&diasEntre(t.fecha,hoy())>=meses*30)
+   .sort((a,b)=>(a.fecha||"").localeCompare(b.fecha||""))}
+function textoRec(t){const c=S.conf,m=Math.max(1,Math.round(diasEntre(t.fecha,hoy())/30));const nom=(t.cliente||"").trim().split(/\s+/)[0];
+  return `Hola${nom?" "+nom:""}! Te escribimos de *${c.nombre}*. Ya pasaron ${m} meses desde el último service${t.moto?" de tu "+t.moto:""}. ¿Querés que te reservemos un turno para revisarla?`}
+function renderRec(){const card=$("#recCard"),l=pendientesRec();if(!l.length){card.style.display="none";return}
+  card.style.display="block";
+  $("#recHelp").textContent=`Clientes con el último trabajo entregado hace más de ${S.conf.meses} meses. Un mensaje a tiempo es un trabajo nuevo.`;
+  $("#recList").innerHTML=l.slice(0,15).map(t=>`<div class="rec" data-id="${t.id}"><div><b>${esc(t.cliente||"Sin nombre")}</b>${t.moto?" · "+esc(t.moto):""}
+   <small>Último trabajo: ${fFecha(t.fecha)} (hace ${Math.round(diasEntre(t.fecha,hoy())/30)} meses)${t.patente?" · "+esc(t.patente):""}</small></div>
+   <div class="row" style="flex-wrap:nowrap"><button type="button" class="btn wa sm" data-r="wa">📲 Recordar</button><button type="button" class="btn lt sm" data-r="no" title="No recordar" aria-label="No recordar">✕</button></div></div>`).join("")
+   +(l.length>15?`<div class="help">y ${l.length-15} más…</div>`:"")}
+$("#recList").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;const t=S.trabajos.find(x=>x.id===b.closest(".rec").dataset.id);if(!t)return;
+  if(b.dataset.r==="wa")abrir(`https://wa.me/${telWa(t.tel)}?text=${encodeURIComponent(textoRec(t))}`);
+  t.recordado=hoy();save();renderRec();toast(b.dataset.r==="wa"?"📲 Abriendo WhatsApp…":"Listo, no se recuerda más")});
+
+function revisarCopia(){const b=$("#recCopia");
+  if(!S.trabajos.length||modoMem||(S.conf.copiaPosp&&diasEntre(S.conf.copiaPosp,hoy())<3)){b.classList.remove("on");return}
+  const d=S.conf.ultimaCopia?diasEntre(S.conf.ultimaCopia,hoy()):(S.trabajos.length>=5?999:diasEntre(S.conf.instalada,hoy()));
+  if(d<APP.diasCopia){b.classList.remove("on");return}
+  $("#recCopiaT").textContent=S.conf.ultimaCopia?`💾 Hace ${d} días que no descargás una copia de seguridad`:"💾 Todavía no descargaste ninguna copia de seguridad";
+  b.classList.add("on")}
+$("#recCopiaSi").addEventListener("click",backup);
+$("#recCopiaNo").addEventListener("click",()=>{S.conf.copiaPosp=hoy();save();revisarCopia()});
+function renderUltCopia(){$("#ultCopia").textContent=S.conf.ultimaCopia?"Última copia descargada: "+fFecha(S.conf.ultimaCopia):"Todavía no descargaste ninguna copia."}
+
+function aplicarRubro(){document.title=APP.nombre+" · Presupuestos";
+  const v=APP.vehiculo;["#cMoto","#cPat"].forEach(s=>$(s).parentElement.style.display=v?"":"none");
+  if(v){$("#lMoto").textContent=v+" (marca / modelo)";$("#cMoto").placeholder=APP.vehiculoEjemplo||"";$("#lPat").textContent=APP.patente;$("#thMoto").textContent=v;$("#thPat").textContent=APP.patente}
+  $("#bTrab").placeholder="🔍 Cliente"+(v?", "+v.toLowerCase()+", "+APP.patente.toLowerCase():"")+"...";
+  $("#soporteTxt").innerHTML=`Esta app es mantenida por <b>${esc(APP.marca)}</b>. Si algo no funciona, cambiás de celular o necesitás una función nueva, escribinos.`;
+  $("#soporteCard").style.display=APP.soporteWa?"":"none";
+  $("#firma").textContent=`${APP.marca} · versión ${APP.version}`}
+$("#soporteWa").addEventListener("click",()=>abrir(`https://wa.me/${APP.soporteWa}?text=${encodeURIComponent("Hola! Te escribo por la app de "+S.conf.nombre+": ")}`));
+
+/* ---------- v5: pagos, caja, monotributo, PDF, asistente ---------- */
+const MEDIOS=["Efectivo","Transferencia","Mercado Pago","Tarjeta","Otro"];
+$("#pgMedio").innerHTML=MEDIOS.map(m=>`<option>${m}</option>`).join("");
+const pagado=p=>(p.pagos||[]).reduce((a,x)=>a+(Number(x.monto)||0),0);
+function sincTrabajo(){if(S.trabajos.some(t=>t.id===P.id))guardarTrabajo(true)}
+function renderPagos(){const l=P.pagos||[],tot=calc(P).tot,pg=pagado(P),sd=tot-pg;
+  $("#pagosList").innerHTML=l.map(x=>`<div class="pg" data-id="${x.id}"><span>${fFecha(x.fecha)} · ${esc(x.medio)}</span><span class="row" style="flex-wrap:nowrap"><b>${money(x.monto)}</b><button type="button" class="btn rd sm" data-pdel="1" aria-label="Borrar pago">✕</button></span></div>`).join("");
+  $("#pSaldo").innerHTML=!l.length?`<span class="help" style="margin:0">Sin pagos registrados</span>`:sd>0.5?`<span class="saldo debe">Saldo: ${money(sd)}</span>`:sd<-0.5?`<span class="saldo ok">Pagó de más: ${money(-sd)}</span>`:`<span class="saldo ok">✔ Pagado completo</span>`}
+$("#pgAdd").addEventListener("click",()=>{const m=parsePrecio($("#pgMonto").value);if(!(m>0)){toast("⚠️ Escribí el monto del pago");$("#pgMonto").focus();return}
+  P.pagos.push({id:uid(),fecha:hoy(),monto:m,medio:$("#pgMedio").value});$("#pgMonto").value="";save();sincTrabajo();renderPagos();toast("✔ Pago de "+money(m)+" registrado")});
+$("#pgMonto").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#pgAdd").click()}});
+$("#pagosList").addEventListener("click",e=>{if(!e.target.dataset.pdel)return;const id=e.target.closest(".pg").dataset.id;const x=P.pagos.find(z=>z.id===id);
+  if(x&&confirm(`¿Borrar el pago de ${money(x.monto)}?`)){P.pagos=P.pagos.filter(z=>z.id!==id);save();sincTrabajo();renderPagos()}});
+function tagPago(t){const pg=pagado(t);if(!pg)return"";const sd=(t.total||calc(t).tot)-pg;
+  return sd>0.5?`<span class="tag t-debe">Debe ${money(sd)}</span>`:`<span class="tag t-pago">💵 Pagado</span>`}
+function renderCaja(){const h=hoy(),por={};let tot=0;
+  S.trabajos.forEach(t=>(t.pagos||[]).forEach(x=>{if(x.fecha===h){por[x.medio]=(por[x.medio]||0)+Number(x.monto);tot+=Number(x.monto)}}));
+  if(!tot){$("#cajaCard").style.display="none";return}$("#cajaCard").style.display="block";
+  $("#cajaHoy").innerHTML=`<div style="background:var(--am)">Total cobrado<b>${money(tot)}</b></div>`+MEDIOS.filter(m=>por[m]).map(m=>`<div>${m}<b>${money(por[m])}</b></div>`).join("")}
+
+const CATS="ABCDEFGHIJK".split("");
+$("#kCat").innerHTML+=CATS.map(c=>`<option value="${c}">Categoría ${c}</option>`).join("");
+const catAlta=()=>!!S.conf.cat&&"ABC".indexOf(S.conf.cat)<0;
+function facturado12(){const d=new Date();d.setFullYear(d.getFullYear()-1);const desde=d.toISOString().slice(0,10);
+  return S.trabajos.filter(t=>t.facturado&&(t.factFecha||t.fecha||"")>desde).reduce((a,t)=>a+(Number(t.factMonto)||Number(t.total)||0),0)}
+function renderMono(){const card=$("#monoCard"),ta=Number(S.conf.topeAnual)||0,f=facturado12();
+  if(!ta){if(!S.trabajos.some(t=>t.facturado)){card.style.display="none";return}card.style.display="block";
+    $("#monoTxt").innerHTML=`<p class="help" style="font-size:14px;margin:0">Facturaste <b>${money(f)}</b> en los últimos 12 meses. Cargá tu categoría y el tope anual en <b>Ajustes → Facturación ARCA</b> y la app te avisa antes de pasarte.</p>`;return}
+  const pc=Math.round(f/ta*100),cls=pc>=100?"alto":pc>=80?"medio":"";card.style.display="block";
+  $("#monoTxt").innerHTML=`<div>${S.conf.cat?"Categoría <b>"+esc(S.conf.cat)+"</b> · ":""}Facturado en los últimos 12 meses: <b>${money(f)}</b> de ${money(ta)} (<b>${pc}%</b>)</div>
+   <div class="bar ${cls}"><i style="width:${Math.min(100,pc)}%"></i></div>
+   <div class="help" style="font-size:13px;margin:0">${pc>=100?"⛔ Superaste el tope de tu categoría. Hablá con tu contador cuanto antes.":pc>=80?"⚠️ Estás cerca del tope. Consultá con tu contador por la recategorización.":"Te queda margen: "+money(ta-f)+"."} Solo cuenta lo que marcaste como facturado en la app.</div>`}
+
+/* --- PDF del presupuesto --- */
+const esCel=()=>window.matchMedia&&matchMedia("(pointer:coarse)").matches;
+let logoJ=null;
+function prepLogo(){const src=logo();if(/^data:image\/jpe?g/.test(src)){logoJ=src;return}
+  const im=new Image();im.onload=()=>{try{const m=260,s=Math.min(1,m/Math.max(im.width||m,im.height||m)),cv=document.createElement("canvas");cv.width=Math.round((im.width||240)*s);cv.height=Math.round((im.height||190)*s);
+    const cx=cv.getContext("2d");cx.fillStyle="#000";cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0,cv.width,cv.height);logoJ=cv.toDataURL("image/jpeg",0.9)}catch(e){logoJ=null}};im.src=src}
+const sumDias=(f,n)=>{const d=new Date(f+"T12:00");d.setDate(d.getDate()+Number(n||0));return d.toISOString().slice(0,10)};
+function wrapTxt(PDF,txt,w,size,bold){const out=[];let cur="";String(txt||"").split(/\s+/).forEach(wd=>{if(!wd)return;const t=cur?cur+" "+wd:wd;
+  if(PDF.tw(PDF.enc(t),size,bold)<=w)cur=t;else{if(cur)out.push(cur);cur=wd}});if(cur)out.push(cur);return out.length?out:[""]}
+function pdfPres(p){const PDF=window.MRP_PDF,c=S.conf,t=calc(p),nro=String(p.nro).padStart(4,"0"),col=APP.colorPrincipal;
+  const d=new PDF({title:"Presupuesto "+nro+" - "+c.nombre,footer:"Documento no válido como factura."+(APP.firmaEnPresupuesto?"   ·   Sistema: "+APP.marca:"")});
+  const X=d.mx,W=d.width(),R=X+W;let y=d.mt,lx=X;
+  if(logoJ){const i=d.addJpeg(logoJ);if(i!=null){const sz=d.imgSize(i),h=66,w=Math.min(120,h*sz.w/sz.h);d.image(i,X,y,w,h);lx=X+w+14}}
+  d.text(c.nombre,lx,y+20,{size:17,bold:true});let yy=y+36;
+  [c.dir,[c.tel,c.red].filter(Boolean).join("  ·  "),c.cuit?"CUIT "+c.cuit:""].filter(Boolean).forEach(l=>{d.text(l,lx,yy,{size:9.5,color:"#444444"});yy+=13});
+  d.text("PRESUPUESTO",R,y+20,{size:16,bold:true,align:"right"});d.text("Nº "+nro,R,y+37,{size:12,align:"right"});
+  d.text("Fecha: "+fFecha(p.fecha),R,y+52,{size:9.5,align:"right",color:"#444444"});
+  d.text("Válido hasta: "+fFecha(sumDias(p.fecha,c.validez||7)),R,y+65,{size:9.5,align:"right",color:"#444444"});
+  y=Math.max(y+76,yy+4);d.rect(X,y,W,3.5,{fill:col});d.y=y+12;
+  const pares=[["Cliente",p.cliente],["Teléfono",p.tel]];if(APP.vehiculo)pares.push([APP.vehiculo,p.moto],[APP.patente,p.patente]);d.kv(pares,pares.length);
+  const cw=[W-250,50,100,100],sz=10,pad=6;
+  const cab=()=>{d.ensure(24);d.rect(X,d.y,W,20,{fill:"#141414"});let x=X;["Descripción","Cant.","Precio unit.","Subtotal"].forEach((h,i)=>{d.text(h,i?x+cw[i]-pad:x+pad,d.y+13.5,{size:9,bold:true,color:"#ffffff",align:i?"right":"left"});x+=cw[i]});d.y+=20};
+  d.y+=4;cab();
+  p.items.forEach((it,ri)=>{const ls=wrapTxt(PDF,it.nombre||"-",cw[0]-pad*2,sz,false),h=ls.length*13+9;
+    if(d.y+h>d.ph-d.mb){d.newPage();cab()}if(ri%2)d.rect(X,d.y,W,h,{fill:"#f5f5f3"});
+    ls.forEach((l,k)=>d.text(l,X+pad,d.y+15+k*13,{size:sz}));let x=X+cw[0];
+    [String(it.cant),money(it.precio),money(it.cant*it.precio)].forEach((v,i)=>{x+=cw[i+1];d.text(v,x-pad,d.y+15,{size:sz,align:"right",bold:i===2})});
+    d.line(X,d.y+h,R,d.y+h,{color:"#dddddd",lw:0.5});d.y+=h});
+  const pg=pagado(p),filas=[["Subtotal",money(t.sub)]];if(p.desc>0)filas.push(["Descuento "+p.desc+"%","-"+money(t.d)]);
+  d.ensure(filas.length*16+40+(pg>0?36:0));d.y+=8;const tx=R-230;
+  filas.forEach(([a,b])=>{d.text(a,tx,d.y+11,{size:10,color:"#444444"});d.text(b,R-pad,d.y+11,{size:10,align:"right"});d.y+=16});
+  d.rect(tx-8,d.y,238,26,{fill:col});d.text("TOTAL",tx,d.y+17.5,{size:13,bold:true,color:"#000000"});d.text(money(t.tot),R-pad,d.y+17.5,{size:13,bold:true,color:"#000000",align:"right"});d.y+=32;
+  if(pg>0){d.text("Pagado / seña",tx,d.y+11,{size:10,color:"#444444"});d.text(money(pg),R-pad,d.y+11,{size:10,align:"right"});d.y+=16;
+    d.text("Saldo a pagar",tx,d.y+11,{size:10.5,bold:true});d.text(money(Math.max(0,t.tot-pg)),R-pad,d.y+11,{size:10.5,bold:true,align:"right"});d.y+=20}
+  d.y+=8;if(p.notas){d.para("Observaciones:",{size:10,bold:true,gap:0});d.para(p.notas,{size:10})}
+  d.y+=4;d.line(X,d.y,R,d.y,{color:"#cccccc"});d.y+=8;
+  d.para(`Presupuesto válido por ${c.validez||7} días desde la fecha de emisión. ${c.pie||""}`,{size:8.5,color:"#555555"});
+  return d.finish()}
+const nomArch=p=>("Presupuesto_"+String(p.nro).padStart(4,"0")+"_"+(p.cliente||"cliente")).normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9_-]+/g,"_").slice(0,60)+".pdf";
+async function compartirPDF(p){if(!p.items.length){toast("⚠️ Agregá al menos un ítem");return}
+  if(!window.MRP_PDF){toast("⚠️ No se pudo cargar el generador de PDF");return}
+  if(p===P)guardarTrabajo(true);let bytes;try{bytes=pdfPres(p)}catch(e){toast("⚠️ No se pudo armar el PDF");return}
+  const nom=nomArch(p),txt=`Hola${p.cliente?" "+p.cliente.split(" ")[0]:""}! Te paso el presupuesto Nº ${String(p.nro).padStart(4,"0")} de ${S.conf.nombre}. Total: ${money(calc(p).tot)}.`;
+  if(esCel()&&navigator.canShare){let f;try{f=new File([bytes],nom,{type:"application/pdf"})}catch(e){}
+    if(f&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],text:txt,title:nom});return}catch(e){if(e&&e.name==="AbortError")return}}}
+  descargar(nom,bytes,"application/pdf");toast(esCel()?"📄 PDF descargado: adjuntalo en WhatsApp":"📄 PDF descargado",4000)}
+$("#bPdf").addEventListener("click",()=>compartirPDF(P));
+
+/* --- Asistente de primera vez --- */
+function abrirWiz(){$("#wNombre").value=S.conf.nombre||"";$("#wTel").value=S.conf.tel||"";$("#wDir").value=S.conf.dir||"";$("#wLogoImg").src=logo();$("#wiz").classList.add("on");setTimeout(()=>$("#wNombre").select(),80)}
+function cerrarWiz(){S.conf.configurada=true;save();$("#wiz").classList.remove("on")}
+$("#wLogo").addEventListener("change",e=>{cargarLogo(e.target.files[0],()=>$("#wLogoImg").src=logo());e.target.value=""});
+$("#wLuego").addEventListener("click",cerrarWiz);
+$("#wOk").addEventListener("click",()=>{const n=$("#wNombre").value.trim();if(!n){toast("⚠️ Escribí el nombre del negocio");$("#wNombre").focus();return}
+  Object.assign(S.conf,{nombre:n,tel:$("#wTel").value.trim(),dir:$("#wDir").value.trim()});cerrarWiz();renderHeader();cargarConf();toast("✔ ¡Listo! Ya podés armar tu primer presupuesto")});
+
+function init(){prepLogo();aplicarRubro();revisarCopia();renderUltCopia();pinEstado();bloquear();renderHeader();renderChips();renderPick();cargarForm();cargarConf();if(!P.fecha){P.fecha=hoy();$("#cFecha").value=P.fecha}if(!S.conf.configurada&&!S.trabajos.length)abrirWiz()}
+init();
+})();
+</script>
+</body>
+</html>
